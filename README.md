@@ -1,24 +1,4 @@
-# tgbot_template
-
-<img height="30em" src="https://raw.githubusercontent.com/anki-geo/ultimate-geography/a44a569a922e1d241517113e2917736af808eed7/src/media/flags/ug-flag-united_kingdom.svg" alt="english" align = "center"/>
-This template is recommended to use in your Telegram bots written on <a href='https://github.com/aiogram/aiogram'>AIOgram</a>.
-You can see tutorials on how to create, and use it on <a href='https://botfather.dev?utm_source=github_template'>Website with course on Telegram Bots Development</a>.
-<br/><br/><br/>
-
-
-<img height="30em" src="https://raw.githubusercontent.com/anki-geo/ultimate-geography/a44a569a922e1d241517113e2917736af808eed7/src/media/flags/ug-flag-ukraine.svg" alt="ukrainian" align = "center"/>
-Цей шаблон рекомендовано використовувати для створення ваших Telegram-ботів, написаних на <a href='https://github.com/aiogram/aiogram'>AIOgram</a>.
-Ви можете переглянути навчальні матеріали щодо створення та використання шаблону на <a href='https://botfather.dev?utm_source=github_template'>веб-сайті з курсом із розробки ботів Telegram</a>
-<br/><br/><br/>
-
-
-<img height="30em" src="https://raw.githubusercontent.com/anki-geo/ultimate-geography/a44a569a922e1d241517113e2917736af808eed7/src/media/flags/ug-flag-russia.svg" alt="russian" align = "center"/>
-Этот шаблон рекомендуется использовать для создания ваших Telegram-ботов, написанных на <a href='https://github.com/aiogram/aiogram'>AIOgram</a>.
-Учебные материалы по созданию и использованию шаблона можно найти на <a href='https://botfather.dev?utm_source=github_template'>веб-сайте с курсом по разработке ботов Telegram</a>
-
-## About the template
-
-**Structure:**
+## **Structure:**
 
 ```
 tgbot_template/
@@ -176,35 +156,3 @@ a services package would depend on the specific needs of the application and the
 The `services` package can contain a `database.py` file, which defines a `Database` class that is used to connect to the
 database and perform database operations.
 
-## docker-compose.yml
-The `docker-compose.yml` file defines the services that are used by the application, as well as the networks and volumes
-that are needed by the application. The file begins by specifying the version of the Docker Compose file format that is
-being used.
-
-The `services` section of the file defines the containers that should be run as part of the application. In this example,
-there is only one service, called `bot`, which is based on the `tg_bot-image` Docker image. The `container_name` specifies the
-name that should be used for the container, and the `build` section specifies the location of the Dockerfile that should
-be used to build the image.
-
-The `working_dir` specifies the working directory that should be used by the container, and the `volumes` section specifies
-the files and directories that should be mounted into the container. In this case, the entire project directory is
-mounted into the container, which allows the application to access the files on the host machine.
-
-The `command` specifies the command that should be run when the container is started, and the `restart` setting specifies
-that the container should be automatically restarted if it exits. 
-
-The `env_file` setting specifies the location of the `.env` file, which contains the configuration settings for the application.
-
-The `networks` section defines the networks that the container should be connected to. In this example, there is only one
-network, called `tg_bot`, which is based on the bridge driver. This network allows the containers in the application to
-communicate with each other.
-
-## Dockerfile
-The `Dockerfile` defines the instructions for building the Docker image that is used by the bot service. The file begins
-by specifying the base image that should be used for the image, which in this case is `python:3.9-buster`. The `ENV`
-instruction sets the value of the `BOT_NAME` environment variable, which is used by the `WORKDIR` instruction to specify the
-working directory for the container.
-
-The `COPY` instructions are used to copy the `requirements.txt` file and the entire project directory into the image. The
-`RUN` instruction is used to install the Python dependencies from the `requirements.txt` file. This allows the application
-to run in the container with all the necessary dependencies.
