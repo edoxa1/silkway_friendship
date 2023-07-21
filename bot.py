@@ -15,19 +15,24 @@ from tgbot.middlewares.environment import EnvironmentMiddleware
 logger = logging.getLogger(__name__)
 
 
-def register_all_middlewares(dp, config):
+def register_all_middlewares(dp: Dispatcher, config):
     dp.setup_middleware(EnvironmentMiddleware(config=config))
 
 
-def register_all_filters(dp):
+def register_all_filters(dp: Dispatcher):
     dp.filters_factory.bind(AdminFilter)
 
 
-def register_all_handlers(dp):
+def register_all_handlers(dp: Dispatcher):
     register_admin(dp)
     register_user(dp)
 
     register_echo(dp)
+
+
+async def on_startup(dp: Dispatcher, config):
+    for uid in config.tg_bot.admin_ids:
+        await dp.bot.send_message(uid, text="Бот запущен")
 
 
 async def main():
@@ -35,7 +40,6 @@ async def main():
         level=logging.INFO,
         format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
     )
-    logger.info("Starting bot")
     config = load_config(".env")
 
     storage = RedisStorage2() if config.tg_bot.use_redis else MemoryStorage()
@@ -48,6 +52,8 @@ async def main():
     register_all_filters(dp)
     register_all_handlers(dp)
 
+    logger.info(f"Starting bot [{(await bot.get_me()).username}].")
+    await on_startup(dp, config)
     # start
     try:
         await dp.start_polling()
