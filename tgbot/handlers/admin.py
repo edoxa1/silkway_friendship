@@ -8,6 +8,7 @@ from tgbot.keyboards import inline
 
 async def admin_start(message: Message):
     await message.reply("Hello, admin!", reply_markup=inline.generate_test_keyboard())
+    await message.answer_dice()
 
 
 async def callback_receiver(call: CallbackQuery):
