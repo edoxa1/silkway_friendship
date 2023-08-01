@@ -2,12 +2,12 @@ from datetime import datetime
 
 
 class Profile:
-    def __init__(self, id: str, db_id: int, name: str, description: str,
+    def __init__(self, uid: int, db_id: int, nickname: str, description: str,
                  photo_id: str, is_active: bool,
                  create_date: datetime, update_date: datetime) -> None:
-        id: str = id
+        uid: int = uid
         db_id: int = db_id
-        name: str = name
+        nickname: str = nickname
         description: str = description
         photo_id: str = photo_id
         is_active: bool = is_active
@@ -17,8 +17,8 @@ class Profile:
     def generate_text(self) -> str:
         pass
     
-    def clear() -> None:
+    def clear(self) -> None:
         pass
     
-    def update() -> None:
+    def update(self) -> None:
         pass

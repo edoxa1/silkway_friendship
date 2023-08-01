@@ -1,21 +1,23 @@
 from tgbot.models import Profile
 from typing import List
 
+from tgbot.models.Enums import University
+
 
 class User:
-    def __init__(self, id: str, username: str, first_last_name: str,
-                 profile: Profile, is_verified: bool, is_banned: bool,
-                 user_buffer: List[str]) -> None:
-        self.id: str = id
-        self.username: str = username
-        self.first_last_name: str = first_last_name
-        self.profile: Profile = profile
+    def __init__(self, uid: int, university: University, is_verified: bool, is_banned: bool, verification_code: int) -> None:
+        self.uid: int = uid
+        self.university: University = university
         self.is_verified: bool = is_verified
         self.is_banned: bool = is_banned
-        self.user_buffer: List[str] = user_buffer
+        self.verification_code = verification_code
+
+        self.user_buffer: List[int] = []
+        self.profile: Profile
 
     def info(self) -> str:
-        pass
+        text = f"{self.uid} {self.university.name} {self.verification_code}"
+        return text
 
     def create_profile(self) -> Profile:
         pass
