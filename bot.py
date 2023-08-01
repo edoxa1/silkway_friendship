@@ -10,6 +10,7 @@ from tgbot.filters.admin import AdminFilter
 from tgbot.filters.callback import CallbackFilter
 from tgbot.handlers.register import register_message_handlers
 from tgbot.middlewares.environment import EnvironmentMiddleware
+from tgbot.misc.set_bot_commands import set_default_commands
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +29,7 @@ def register_all_handlers(dp: Dispatcher):
 
 
 async def on_startup(dp: Dispatcher, config):
+    await set_default_commands(dp)  # set default commands. Use ctrl+LMB to set bot commands
     for uid in config.tg_bot.admin_ids:
         await dp.bot.send_message(uid, text="Бот запущен")
 

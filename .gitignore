@@ -62,5 +62,9 @@ venv.bak/
 .idea/*
 .env
 
+<<<<<<< HEAD
 *.db
 database.db
+=======
+# vim 
+*.swp
