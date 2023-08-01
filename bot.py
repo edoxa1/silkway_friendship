@@ -8,9 +8,7 @@ from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from tgbot.config import load_config
 from tgbot.filters.admin import AdminFilter
 from tgbot.filters.callback import CallbackFilter
-from tgbot.handlers.admin import register_admin
-from tgbot.handlers.echo import register_echo
-from tgbot.handlers.user import register_user
+from tgbot.handlers.register import register_message_handlers
 from tgbot.middlewares.environment import EnvironmentMiddleware
 
 logger = logging.getLogger(__name__)
@@ -26,10 +24,7 @@ def register_all_filters(dp: Dispatcher):
 
 
 def register_all_handlers(dp: Dispatcher):
-    register_admin(dp)
-    register_user(dp)
-
-    register_echo(dp)
+    register_message_handlers(dp)
 
 
 async def on_startup(dp: Dispatcher, config):
@@ -42,7 +37,7 @@ async def main():
         level=logging.INFO,
         format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
     )
-    config = load_config(".env")
+    config = load_config("./tgbot/services/database.db", ".env")
 
     storage = RedisStorage2() if config.tg_bot.use_redis else MemoryStorage()
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
@@ -54,7 +49,7 @@ async def main():
     register_all_filters(dp)
     register_all_handlers(dp)
 
-    logger.info(f"Starting bot [{(await bot.get_me()).username}].")
+    logger.info(f"Starting bot [@{(await bot.get_me()).username}].")
     await on_startup(dp, config)
     # start
     try:
