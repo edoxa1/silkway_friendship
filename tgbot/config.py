@@ -2,13 +2,7 @@ from dataclasses import dataclass
 
 from environs import Env
 
-
-@dataclass
-class DbConfig:
-    host: str
-    password: str
-    user: str
-    database: str
+from tgbot.services.database import Database
 
 
 @dataclass
@@ -26,11 +20,11 @@ class Miscellaneous:
 @dataclass
 class Config:
     tg_bot: TgBot
-    db: DbConfig
+    db: Database
     misc: Miscellaneous
 
 
-def load_config(path: str = None):
+def load_config(db_path: str, path: str = None):
     env = Env()
     env.read_env(path)
 
@@ -40,11 +34,6 @@ def load_config(path: str = None):
             admin_ids=list(map(int, env.list("ADMINS"))),
             use_redis=env.bool("USE_REDIS"),
         ),
-        db=DbConfig(
-            host=env.str('DB_HOST'),
-            password=env.str('DB_PASS'),
-            user=env.str('DB_USER'),
-            database=env.str('DB_NAME')
-        ),
+        db=Database(db_path),
         misc=Miscellaneous()
     )
