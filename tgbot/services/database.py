@@ -15,12 +15,9 @@ class Database:
         self.profiles_table = ProfilesTable(path, table_names[1])
         self.universities_table = UniversitiesTable(path, table_names[2])
         
-        # self.create_tables()
-        
-    def create_tables(self):
-        self.users_table.__create_table()
-        self.profiles_table.__create_table()
-        self.universities_table.__create_table()
+        self.users_table.create_table()
+        self.profiles_table.create_table()
+        self.universities_table.create_table()
 
 
 class BaseTable:
@@ -28,7 +25,7 @@ class BaseTable:
         self.connection = sqlite3.connect(path)
         self.cursor = self.connection.cursor()
         self.table_name = table_name
-
+        
     def print_all(self):
         self.cursor.execute(f"SELECT * FROM {self.table_name};")
         for row in self.cursor.fetchall():
@@ -41,7 +38,7 @@ class BaseTable:
     def close_connection(self):
         """Close the connection"""
         self.connection.close()
-
+    
 
 class UsersTable(BaseTable):
     def __init__(self, path: str, table_name: str):
@@ -91,7 +88,8 @@ class UsersTable(BaseTable):
 
         return None
     
-    def __create_table(self):
+    def create_table(self):
+        print("1")
         self.cursor.execute(f"CREATE TABLE {self.table_name} ("
                             f"id INTEGER PRIMARY KEY AUTOINCREMENT,"
                             f"user_id INTEGER NOT NULL,"
@@ -107,7 +105,8 @@ class ProfilesTable(BaseTable):
     def __init__(self, path: str, table_name: str):
         super().__init__(path, table_name)
           
-    def __create_table(self):
+    def create_table(self):
+        print("2")
         self.cursor.execute(f"CREATE TABLE {self.table_name} ("
                             f"id INTEGER PRIMARY KEY AUTOINCREMENT,"
                             f"user_id INTEGER NOT NULL,"
@@ -125,10 +124,11 @@ class UniversitiesTable(BaseTable):
     def __init__(self, path: str, table_name: str):
         super().__init__(path, table_name)
     
-    def __create_table(self):
+    def create_table(self):
+        print("3")
         self.cursor.execute(f"CREATE TABLE {self.table_name} ("
                             f"id INTEGER PRIMARY KEY AUTOINCREMENT,"
                             f"name varchar(255),"
-                            f"domain varchar(255);")
+                            f"domain varchar(255));")
         
         self.connection.commit()

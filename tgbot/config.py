@@ -34,6 +34,6 @@ def load_config(db_path: str, path: str = None):
             admin_ids=list(map(int, env.list("ADMINS"))),
             use_redis=env.bool("USE_REDIS"),
         ),
-        db=Database(db_path),
+        db=Database(db_path, ["users", "profiles", "universities"]),
         misc=Miscellaneous()
     )
