@@ -8,12 +8,14 @@ def generate_test_keyboard() -> InlineKeyboardMarkup:
 
     return kb
 
+
 def generate_startup_keyboard() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=2)
     kb.add(InlineKeyboardButton(text="find someone", callback_data="find_someone"), 
            InlineKeyboardButton(text="my profile", callback_data="my_profile"))
     
     return kb
+
 
 def generate_find_someone_keyboard() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=3)
@@ -23,6 +25,7 @@ def generate_find_someone_keyboard() -> InlineKeyboardMarkup:
     
     return kb
 
+
 def generate_profile_keyboard() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=3)
     kb.add(InlineKeyboardButton(text="Deactivate", callback_data="deactivate"),
@@ -31,16 +34,19 @@ def generate_profile_keyboard() -> InlineKeyboardMarkup:
     
     return kb
 
+
 def generate_match_keyboard() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=3)
-    #show @user or smth idk what to do with this
+    # show @user or smth idk what to do with this
     return kb
+
 
 def generate_deactivate_keyboard() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=2)
     kb.add(InlineKeyboardButton(text="yes", callback_data="deactivate"),
            InlineKeyboardButton(text="no", callback_data="back_to_menu"))
     return kb
+
 
 def generate_edit_profile_keyboard() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=3)
@@ -49,4 +55,3 @@ def generate_edit_profile_keyboard() -> InlineKeyboardMarkup:
            InlineKeyboardButton(text="Back to menu", callback_data="back_to_menu"))
     
     return kb
-
