@@ -13,14 +13,10 @@ class User:
         self.verification_code = verification_code
 
         self.user_buffer: List[int] = []
-        self.profile: Profile
 
     def info(self) -> str:
         text = f"{self.uid} {self.university.name} {self.verification_code}"
         return text
-
-    def create_profile(self) -> Profile:
-        pass
 
     def ban(self) -> bool:
         pass
