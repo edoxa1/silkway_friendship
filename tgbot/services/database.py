@@ -2,21 +2,34 @@ from datetime import datetime
 from random import randint
 import sqlite3
 
-from tgbot.models.Enums import University
-from tgbot.models.User import User
-from tgbot.models.Profile import Profile
+from tgbot.models import Enums
+from tgbot.models import User
+from tgbot.models import Profile
 
 
 class Database:
+    __instance = None
+
+    @staticmethod
+    def get_instance():
+        if not Database.__instance:
+            raise Exception("No instance")
+
+        return Database.__instance
+
     def __init__(self, path: str, table_names: list[str]) -> None:
         """
         :param path: Path from CWD to database [.db]
         :param table_names: contains table names, len(table_names) = 3
         """
+        if Database.__instance:
+            raise Exception("Database instance already exists")
+
         self.users_table = UsersTable(path, table_names[0])
         self.profiles_table = ProfilesTable(path, table_names[1])
         self.universities_table = UniversitiesTable(path, table_names[2])
-        
+
+        Database.__instance = self
         # self.create_tables()
 
     def create_tables(self):
@@ -62,17 +75,17 @@ class UsersTable(BaseTable):
         except:
             return False
 
-    def get_user(self, user_id: int) -> User:
+    def get_user(self, user_id: int) -> User.User:
         self.cursor.execute(f"SELECT DISTINCT * FROM {self.table_name} "
                             f"WHERE user_id=?", (user_id, ))
 
         data = self.cursor.fetchone()
         if data:
-            return User(user_id, University(data[2]), data[3], data[4], data[5])
+            return User.User(user_id, Enums.University(data[2]), data[3], data[4], data[5])
 
         raise Exception("User not found")
     
-    def add_user(self, user_id: int, university: University) -> User:
+    def add_user(self, user_id: int, university: Enums.University) -> User:
         """Add user if not exists. If exists, raises an error 'User already exists'
         :param user_id: user id
         :param university: University(Enum) -> NU = 1, AITU = 2
@@ -86,7 +99,7 @@ class UsersTable(BaseTable):
                                 f"(user_id, university, is_verified, is_banned, verification_code) "
                                 "VALUES (?, ?, ?, ?, ?)", (user_id, university.value, False, False, code))
             self.connection.commit()
-            return User(user_id, university, False, False, code)
+            return User.User(user_id, university, False, False, code)
 
         raise Exception("User already exists")
     
@@ -128,10 +141,24 @@ class ProfilesTable(BaseTable):
 
         data = self.cursor.fetchone()
         if data:
-            profile = Profile(user_id, data[2], data[3], data[4], data[5], data[6], data[7])
+            profile = Profile.Profile(user_id, data[2], data[3], data[4], data[5], data[6], data[7])
             return profile
 
         return None
+
+    def deactivate_profile(self, uid: [int | str]):
+        self.cursor.execute(f"UPDATE {self.table_name} "
+                            f"SET is_active=?, last_updated=?"
+                            f"WHERE user_id=?", (False, datetime.now(), uid, ))
+
+        self.connection.commit()
+
+    def activate_profile(self, uid: [int | str]):
+        self.cursor.execute(f"UPDATE {self.table_name} "
+                            f"SET is_active=?, last_updated=?"
+                            f"WHERE user_id=?", (True, datetime.now(), uid, ))
+
+        self.connection.commit()
 
     def create_table(self):
         self.cursor.execute(f"CREATE TABLE {self.table_name} ("
