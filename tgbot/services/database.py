@@ -1,8 +1,10 @@
+from datetime import datetime
 from random import randint
 import sqlite3
 
 from tgbot.models.Enums import University
 from tgbot.models.User import User
+from tgbot.models.Profile import Profile
 
 
 class Database:
@@ -15,6 +17,9 @@ class Database:
         self.profiles_table = ProfilesTable(path, table_names[1])
         self.universities_table = UniversitiesTable(path, table_names[2])
         
+        # self.create_tables()
+
+    def create_tables(self):
         self.users_table.create_table()
         self.profiles_table.create_table()
         self.universities_table.create_table()
@@ -27,17 +32,23 @@ class BaseTable:
         self.table_name = table_name
         
     def print_all(self):
+        print("-" * 10)
+        print(f"DATA FOR {self.table_name}")
         self.cursor.execute(f"SELECT * FROM {self.table_name};")
         for row in self.cursor.fetchall():
             print(row)
 
     def get_count(self) -> int:
-        self.cursor.execute(f"SELECT COUNT(user_id) FROM {self.table_name};")
+        print(f"GET COUNT FOR {self.table_name}")
+        self.cursor.execute(f"SELECT COUNT(id) FROM {self.table_name};")
         return int(self.cursor.fetchone()[0])
 
     def close_connection(self):
         """Close the connection"""
         self.connection.close()
+
+    def __del__(self):
+        self.connection.commit()
     
 
 class UsersTable(BaseTable):
@@ -62,7 +73,7 @@ class UsersTable(BaseTable):
         raise Exception("User not found")
     
     def add_user(self, user_id: int, university: University) -> User:
-        """Add user if not exists. If exists, raises an error 'User already exists'"
+        """Add user if not exists. If exists, raises an error 'User already exists'
         :param user_id: user id
         :param university: University(Enum) -> NU = 1, AITU = 2
 
@@ -89,7 +100,6 @@ class UsersTable(BaseTable):
         return None
     
     def create_table(self):
-        print("1")
         self.cursor.execute(f"CREATE TABLE {self.table_name} ("
                             f"id INTEGER PRIMARY KEY AUTOINCREMENT,"
                             f"user_id INTEGER NOT NULL,"
@@ -104,9 +114,26 @@ class UsersTable(BaseTable):
 class ProfilesTable(BaseTable):
     def __init__(self, path: str, table_name: str):
         super().__init__(path, table_name)
-          
+
+    def add_profile(self, user_id: int, nickname: str, description: str, photo_id: str,
+                    is_active: bool, create_date: datetime, last_updated: datetime):
+        self.cursor.execute(f"INSERT INTO {self.table_name} "
+                            f"(user_id, nickname, description, photo_id, is_active, create_date, last_updated) "
+                            f"VALUES (?, ?, ?, ?, ?, ?, ?);",
+                            (user_id, nickname, description, photo_id, is_active, create_date, last_updated, ))
+
+    def get_profile(self, user_id: int) -> Profile:
+        self.cursor.execute(f"SELECT DISTINCT * FROM {self.table_name} "
+                            f"WHERE user_id=?", (user_id, ))
+
+        data = self.cursor.fetchone()
+        if data:
+            profile = Profile(user_id, data[2], data[3], data[4], data[5], data[6], data[7])
+            return profile
+
+        return None
+
     def create_table(self):
-        print("2")
         self.cursor.execute(f"CREATE TABLE {self.table_name} ("
                             f"id INTEGER PRIMARY KEY AUTOINCREMENT,"
                             f"user_id INTEGER NOT NULL,"
@@ -123,12 +150,18 @@ class ProfilesTable(BaseTable):
 class UniversitiesTable(BaseTable):
     def __init__(self, path: str, table_name: str):
         super().__init__(path, table_name)
-    
+
     def create_table(self):
-        print("3")
         self.cursor.execute(f"CREATE TABLE {self.table_name} ("
                             f"id INTEGER PRIMARY KEY AUTOINCREMENT,"
                             f"name varchar(255),"
                             f"domain varchar(255));")
         
+        self.connection.commit()
+
+    def __add_university(self):
+        self.cursor.execute(f"INSERT INTO {self.table_name} (name, domain)"
+                            f"VALUES (?, ?)", ("NU", "nu.edu.kz", ))
+        self.cursor.execute(f"INSERT INTO {self.table_name} (name, domain)"
+                            f"VALUES (?, ?)", ("AITU", "aitu.edu.kz", ))
         self.connection.commit()

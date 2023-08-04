@@ -3,11 +3,9 @@ import logging
 from aiogram import Dispatcher
 from aiogram.types import Message, CallbackQuery
 
-from tgbot.keyboards import inline
-
 
 async def admin_start(message: Message):
-    await message.reply("Hello, admin!", reply_markup=inline.generate_test_keyboard())
+    await message.reply("Hello, admin!")
     await message.answer_dice()
 
 

@@ -1,6 +1,7 @@
 from aiogram import Dispatcher
 from aiogram.types import CallbackQuery, Message
 
+from tgbot.handlers.user.profile import profile_commands
 from tgbot.keyboards import inline
 from tgbot.models.Enums import University
 from tgbot.services.database import Database, UsersTable
@@ -11,34 +12,29 @@ async def user_start(message: Message):
 
 
 async def find_someone(call: CallbackQuery):
-    db: Database = call.bot['config'].db  # access DB using bot['config'] (see tgbot/config.py)
-    users_table: UsersTable = db.users_table
-    
-    if not users_table.user_exists(call.from_user.id):
-        user = users_table.add_user(call.from_user.id, University.AITU)
-        await call.message.answer(user.info())
-        return
-
-    await call.message.answer(f"Person id {call.from_user.id} exists: {users_table.user_exists(call.from_user.id)}")
-    user = users_table.get_user(call.from_user.id)
-    await call.message.answer(user.info())
-    # see tgbot/services/database.py to check all methods
     await call.answer("Loading...")  # always answer to calls!
+    db: Database = call.bot['config'].db  # access DB using bot['config'] (see tgbot/config.py)
 
 
 async def my_profile(call: CallbackQuery):
-    await call.message.answer(call.data)
-    await call.answer("you chose tshirts")
-    db = call.bot['config'].db
-    db.print_all()
-    code = db.get_user_verification_code(call.from_user.id)
-    if code:
-        await call.message.answer(text=code)
-
     await call.answer("Loading...")
+    db: Database = call.bot['config'].db
+    profile = db.profiles_table.get_profile(call.from_user.id)
+    if not profile:
+        kb = inline.generate_profile_empty_keyboard()
+        await call.message.answer(text="You don't have profile", reply_markup=kb)
+        return
+
+    kb = inline.generate_profile_keyboard()
+    text = profile.generate_text()
+    await call.message.answer_photo(photo=profile.photo_id, caption=text, reply_markup=kb)
 
 
 def register_user(dp: Dispatcher):
+    # start command
     dp.register_message_handler(user_start, commands=["start"], state="*")
+    # start menu callback handlers
     dp.register_callback_query_handler(find_someone, callback_data="find_someone")
     dp.register_callback_query_handler(my_profile, callback_data="my_profile")
+
+    profile_commands(dp)
