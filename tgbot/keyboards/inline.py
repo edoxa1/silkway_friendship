@@ -18,9 +18,10 @@ def generate_find_someone_keyboard() -> InlineKeyboardMarkup:
     return kb
 
 
-def generate_profile_keyboard() -> InlineKeyboardMarkup:
-    kb = InlineKeyboardMarkup(row_width=3)
-    kb.add(InlineKeyboardButton(text="Deactivate", callback_data="deactivate"),
+def generate_profile_keyboard(is_active: bool) -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(row_width=2)
+    kb.add(InlineKeyboardButton(text="Deactivate" if is_active else "Activate",
+                                callback_data="deactivate" if is_active else "activate"),
            InlineKeyboardButton(text="Edit profile", callback_data="edit_profile"),
            InlineKeyboardButton(text="Back to menu", callback_data="back_to_menu"))
     
@@ -41,17 +42,11 @@ def generate_match_keyboard() -> InlineKeyboardMarkup:
     return kb
 
 
-def generate_deactivate_keyboard() -> InlineKeyboardMarkup:
-    kb = InlineKeyboardMarkup(row_width=2)
-    kb.add(InlineKeyboardButton(text="yes", callback_data="deactivate"),
-           InlineKeyboardButton(text="no", callback_data="back_to_menu"))
-    return kb
-
-
 def generate_edit_profile_keyboard() -> InlineKeyboardMarkup:
-    kb = InlineKeyboardMarkup(row_width=3)
-    kb.add(InlineKeyboardButton(text="Change profile picture", callback_data="change_profile_picture"),
-           InlineKeyboardButton(text="Change profile bio", callback_data="change_profile_bio"),
-           InlineKeyboardButton(text="Back to menu", callback_data="back_to_menu"))
+    kb = InlineKeyboardMarkup(row_width=2)
+    kb.add(InlineKeyboardButton(text="Name", callback_data="change_profile_name"),
+           InlineKeyboardButton(text="Picture", callback_data="change_profile_picture"),
+           InlineKeyboardButton(text="Bio", callback_data="change_profile_bio"))
+    kb.add(InlineKeyboardButton(text="Back to menu", callback_data="back_to_menu"))
     
     return kb
