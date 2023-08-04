@@ -56,6 +56,32 @@ class BaseTable:
         self.cursor.execute(f"SELECT COUNT(id) FROM {self.table_name};")
         return int(self.cursor.fetchone()[0])
 
+    def update_column(self, user_id: int, column_name: str, value: any):
+        self.cursor.execute(f"UPDATE {self.table_name} "
+                            f"SET {column_name}=?, last_updated=?"
+                            f"WHERE user_id=?", (value, datetime.now(), user_id, ))
+        self.connection.commit()
+
+    def get_column(self, user_id: int, column_name: str):
+        self.cursor.execute(f"SELECT {column_name} FROM {self.table_name} "
+                            f"WHERE user_id=?", (user_id, ))
+
+        data = self.cursor.fetchone()
+        if data:
+            return data
+
+        return ()  # empty tuple
+
+    def get_row(self, user_id: int):
+        self.cursor.execute(f"SELECT * FROM {self.table_name} "
+                            f"WHERE user_id=?", (user_id, ))
+
+        data = self.cursor.fetchone()
+        if data:
+            return data
+
+        return ()  # empty tuple
+
     def close_connection(self):
         """Close the connection"""
         self.connection.close()
@@ -69,21 +95,16 @@ class UsersTable(BaseTable):
         super().__init__(path, table_name)
         
     def user_exists(self, user_id: int) -> bool:
-        try:
-            self.get_user(user_id)
-            return True
-        except:
+        if not self.get_user(user_id):
             return False
+        return True
 
     def get_user(self, user_id: int) -> User.User:
-        self.cursor.execute(f"SELECT DISTINCT * FROM {self.table_name} "
-                            f"WHERE user_id=?", (user_id, ))
-
-        data = self.cursor.fetchone()
+        data = self.get_row(user_id)
         if data:
             return User.User(user_id, Enums.University(data[2]), data[3], data[4], data[5])
 
-        raise Exception("User not found")
+        return None
     
     def add_user(self, user_id: int, university: Enums.University) -> User:
         """Add user if not exists. If exists, raises an error 'User already exists'
@@ -104,9 +125,7 @@ class UsersTable(BaseTable):
         raise Exception("User already exists")
     
     def get_user_verification_code(self, user_id: int) -> int:
-        self.cursor.execute(f"SELECT verification_code FROM {self.table_name} "
-                            f"WHERE user_id=?", (user_id, ))
-        data = self.cursor.fetchone()
+        data = self.get_column(user_id, "verification_code")
         if data:
             return int(data[0])
 
@@ -119,7 +138,9 @@ class UsersTable(BaseTable):
                             f"university INTEGER,"
                             f"is_verified BOOL,"
                             f"is_banned BOOL,"
-                            f"verification_code INTEGER);")
+                            f"verification_code INTEGER,"
+                            f"created_date DATETIME,"
+                            f"last_updated DATETIME);")
         
         self.connection.commit()
     
@@ -136,29 +157,18 @@ class ProfilesTable(BaseTable):
                             (user_id, nickname, description, photo_id, is_active, create_date, last_updated, ))
 
     def get_profile(self, user_id: int) -> Profile:
-        self.cursor.execute(f"SELECT DISTINCT * FROM {self.table_name} "
-                            f"WHERE user_id=?", (user_id, ))
-
-        data = self.cursor.fetchone()
+        data = self.get_row(user_id)
         if data:
             profile = Profile.Profile(user_id, data[2], data[3], data[4], data[5], data[6], data[7])
             return profile
 
         return None
 
-    def deactivate_profile(self, uid: [int | str]):
-        self.cursor.execute(f"UPDATE {self.table_name} "
-                            f"SET is_active=?, last_updated=?"
-                            f"WHERE user_id=?", (False, datetime.now(), uid, ))
+    def get_profile_from_db_id(self, db_id: int):
+        data = self.cursor.execute(f"SELECT * FROM {self.table_name} "
+                                   f"WHERE id=?", (db_id, ))
 
-        self.connection.commit()
-
-    def activate_profile(self, uid: [int | str]):
-        self.cursor.execute(f"UPDATE {self.table_name} "
-                            f"SET is_active=?, last_updated=?"
-                            f"WHERE user_id=?", (True, datetime.now(), uid, ))
-
-        self.connection.commit()
+        return data
 
     def create_table(self):
         self.cursor.execute(f"CREATE TABLE {self.table_name} ("
