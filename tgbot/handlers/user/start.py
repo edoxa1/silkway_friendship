@@ -8,7 +8,10 @@ from tgbot.services.database import Database, UsersTable
 
 
 async def user_start(message: Message):
+    db: Database = message.bot['config'].db
     await message.reply(f"Hello, {message.from_user.first_name}!", reply_markup=inline.generate_startup_keyboard())
+    if not db.users_table.user_exists(message.from_id):
+        db.users_table.add_user(message.from_id, University.NOT_SPECIFIED)
 
 
 async def find_someone(call: CallbackQuery):
@@ -25,9 +28,10 @@ async def my_profile(call: CallbackQuery):
         await call.message.answer(text="You don't have profile", reply_markup=kb)
         return
 
-    kb = inline.generate_profile_keyboard()
+    kb = inline.generate_profile_keyboard(profile.is_active)
     text = profile.generate_text()
     await call.message.answer_photo(photo=profile.photo_id, caption=text, reply_markup=kb)
+    await call.message.delete()
 
 
 def register_user(dp: Dispatcher):
