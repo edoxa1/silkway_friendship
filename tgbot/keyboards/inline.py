@@ -1,14 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-def generate_test_keyboard() -> InlineKeyboardMarkup:
-    kb = InlineKeyboardMarkup(row_width=2)
-    kb.add(InlineKeyboardButton(text="T-shirts", callback_data="cringe"),
-           InlineKeyboardButton(text="Shoes", callback_data="shoes"))
-
-    return kb
-
-
 def generate_startup_keyboard() -> InlineKeyboardMarkup:
     kb = InlineKeyboardMarkup(row_width=2)
     kb.add(InlineKeyboardButton(text="find someone", callback_data="find_someone"), 
@@ -32,6 +24,14 @@ def generate_profile_keyboard() -> InlineKeyboardMarkup:
            InlineKeyboardButton(text="Edit profile", callback_data="edit_profile"),
            InlineKeyboardButton(text="Back to menu", callback_data="back_to_menu"))
     
+    return kb
+
+
+def generate_profile_empty_keyboard() -> InlineKeyboardMarkup:
+    kb = InlineKeyboardMarkup(row_width=3)
+    kb.add(InlineKeyboardButton(text="Create profile", callback_data="create_profile"),
+           InlineKeyboardButton(text="Back to menu", callback_data="back_to_menu"))
+
     return kb
 
 
